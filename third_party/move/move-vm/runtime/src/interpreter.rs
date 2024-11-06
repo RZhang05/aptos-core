@@ -1238,7 +1238,7 @@ impl Stack {
     }
 
     fn check_balance(&self) -> PartialVMResult<()> {
-        if self.types.len() > self.value.len() {
+        if self.types.len() != self.value.len() {
             return Err(
                 PartialVMError::new(StatusCode::UNKNOWN_INVARIANT_VIOLATION_ERROR).with_message(
                     "Paranoid Mode: Type and value stack need to be balanced".to_string(),
