@@ -40,17 +40,23 @@ pub fn print_bytecode(module: &CompiledModule) {
 }
 
 pub fn insert_magic_bytecode(module: &mut CompiledModule) {
-    // assume code exists
-    let mut code = &mut module.function_defs[0].code.as_mut().unwrap().code;
+    // assume code and function exists
+    let mut code = &mut module.function_defs[2].code.as_mut().unwrap().code;
 
     // append bytecode
-    code.insert(0, Bytecode::LdTrue);
-    code.insert(1, Bytecode::Pop);;
+    code.insert(1, Bytecode::Magic);
+    code[2] = Bytecode::Ret;
 }
 
 pub fn load_edit_module() -> CompiledModule {
     let code = r#"
         module {{ADDR}}::M {
+            public fun a(): u64 {
+                return 100
+            }
+            public fun b(): u64 {
+                return 200
+            }
             public fun foo(value: u64): u64 {
                 return value
             }
@@ -95,8 +101,9 @@ fn test_dynamic_dispatch() {
 
     let module_storage = storage.as_unsync_module_storage(runtime_environment);
 
-    let args = serialize_values(&vec![MoveValue::U64(0)]);
     let traversal_storage = TraversalStorage::new();
+
+    let mut param = 0;
 
     let SerializedReturnValues {
         return_values,
@@ -106,14 +113,35 @@ fn test_dynamic_dispatch() {
         &module.self_id(),
         &fun_name,
         vec![],
-        args.clone(),
+        serialize_values(&vec![MoveValue::U64(param)]),
         &mut UnmeteredGasMeter,
         &mut TraversalContext::new(&traversal_storage),
         &module_storage,
     ).unwrap();
 
-    let result = MoveValue::simple_deserialize(&return_values[0].0, &return_values[0].1)
+    let mut result = MoveValue::simple_deserialize(&return_values[0].0, &return_values[0].1)
         .unwrap();
 
-    assert_eq!(result, MoveValue::U64(0));
+    assert_eq!(result, MoveValue::U64(100));
+
+    param = 6;
+
+    let SerializedReturnValues {
+        return_values,
+        mutable_reference_outputs: _,
+    } = sess.
+    execute_function_bypass_visibility(
+        &module.self_id(),
+        &fun_name,
+        vec![],
+        serialize_values(&vec![MoveValue::U64(param)]),
+        &mut UnmeteredGasMeter,
+        &mut TraversalContext::new(&traversal_storage),
+        &module_storage,
+    ).unwrap();
+
+    result = MoveValue::simple_deserialize(&return_values[0].0, &return_values[0].1)
+        .unwrap();
+
+    assert_eq!(result, MoveValue::U64(200));
 }

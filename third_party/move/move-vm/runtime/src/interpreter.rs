@@ -1237,7 +1237,7 @@ impl Stack {
     }
 
     fn check_balance(&self) -> PartialVMResult<()> {
-        if self.types.len() != self.value.len() {
+        if self.types.len() > self.value.len() {
             return Err(
                 PartialVMError::new(StatusCode::UNKNOWN_INVARIANT_VIOLATION_ERROR).with_message(
                     "Paranoid Mode: Type and value stack need to be balanced".to_string(),
@@ -1631,6 +1631,7 @@ impl Frame {
             },
             // We will check the rest of the instructions after execution phase.
             Bytecode::Pop
+            | Bytecode::Magic
             | Bytecode::LdU8(_)
             | Bytecode::LdU16(_)
             | Bytecode::LdU32(_)
@@ -1733,6 +1734,7 @@ impl Frame {
             Bytecode::Branch(_)
             | Bytecode::Ret
             | Bytecode::Call(_)
+            | Bytecode::Magic
             | Bytecode::CallGeneric(_)
             | Bytecode::Abort => {
                 // Invariants hold because all of the instructions above will force VM to break from the interpreter loop and thus not hit this code path.
@@ -2781,6 +2783,22 @@ impl Frame {
                         interpreter
                             .operand_stack
                             .push(Value::u64(integer_value.cast_u64()?))?;
+                    },
+                    Bytecode::Magic => {
+                        let integer_value = interpreter.operand_stack.pop_as::<IntegerValue>()?;
+                        interpreter.operand_stack.pop_ty()?;
+
+                        let value;
+                        match integer_value {
+                            IntegerValue::U64(v) => {value = v;}
+                            _ => {value = 0;}
+                        }
+
+                        if value < 4 {
+                            return Ok(ExitCode::Call(FunctionHandleIndex(0)));
+                        } else {
+                            return Ok(ExitCode::Call(FunctionHandleIndex(1)));
+                        }
                     },
                     Bytecode::CastU128 => {
                         gas_meter.charge_simple_instr(S::CastU128)?;

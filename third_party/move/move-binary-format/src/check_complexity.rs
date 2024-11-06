@@ -360,6 +360,7 @@ impl<'a> BinaryComplexityMeter<'a> {
                 | MoveTo(_)
                 | MoveFrom(_)
                 | Abort
+                | Magic
                 | Nop => (),
             }
         }

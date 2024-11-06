@@ -872,6 +872,13 @@ fn verify_instr(
             }
             verifier.push(meter, ST::U8)?;
         },
+        Bytecode::Magic => {
+            let operand = safe_unwrap!(verifier.stack.pop());
+            if !operand.is_integer() {
+                return Err(verifier.error(StatusCode::INTEGER_OP_TYPE_MISMATCH_ERROR, offset));
+            }
+            verifier.push(meter, ST::U64)?;
+        },
         Bytecode::CastU64 => {
             let operand = safe_unwrap!(verifier.stack.pop());
             if !operand.is_integer() {

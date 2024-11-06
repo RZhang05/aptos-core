@@ -596,6 +596,14 @@ impl<'a> StacklessBytecodeGenerator<'a> {
                 self.temp_count += 1;
             },
 
+            MoveBytecode::Magic => {
+                let operand_index = self.temp_stack.pop().unwrap();
+                let temp_index = self.temp_count;
+                self.temp_stack.push(temp_index);
+                self.local_types.push(Type::Primitive(PrimitiveType::U64));
+                self.temp_count += 1;
+            },
+
             MoveBytecode::CastU128 => {
                 let operand_index = self.temp_stack.pop().unwrap();
                 let temp_index = self.temp_count;
