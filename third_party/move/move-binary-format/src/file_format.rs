@@ -1531,6 +1531,20 @@ pub enum Bytecode {
 
     #[group = "control_flow"]
     #[description = r#"
+        Call a function based on the value at the top of the stack.
+    "#]
+    #[semantics = r#"
+        stack >> value
+        if value < 4
+            call some function
+        else
+            call some other function
+    "#]
+    #[runtime_check_prologue = "ty_stack >> _"]
+    Magic,
+
+    #[group = "control_flow"]
+    #[description = r#"
         Branch to the instruction at position `code_offset` if the value at the top of the stack is true.
         Code offsets are relative to the start of the function body.
     "#]
@@ -2944,6 +2958,7 @@ impl ::std::fmt::Debug for Bytecode {
         match self {
             Bytecode::Pop => write!(f, "Pop"),
             Bytecode::Ret => write!(f, "Ret"),
+            Bytecode::Magic => write!(f, "Magic"),
             Bytecode::BrTrue(a) => write!(f, "BrTrue({})", a),
             Bytecode::BrFalse(a) => write!(f, "BrFalse({})", a),
             Bytecode::Branch(a) => write!(f, "Branch({})", a),

@@ -262,6 +262,7 @@ impl<'a> SignatureChecker<'a> {
                 // List out the other options explicitly so there's a compile error if a new
                 // bytecode gets added.
                 Pop
+                | Magic
                 | Ret
                 | Branch(_)
                 | BrTrue(_)

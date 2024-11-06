@@ -11748,6 +11748,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "move-vm-cadence-tests"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bytes",
+ "memory-stats",
+ "move-binary-format",
+ "move-bytecode-verifier",
+ "move-compiler",
+ "move-core-types",
+ "move-disassembler",
+ "move-ir-types",
+ "move-stdlib",
+ "move-vm-runtime",
+ "move-vm-test-utils",
+ "move-vm-types",
+ "smallvec",
+ "tempfile",
+]
+
+[[package]]
 name = "move-vm-integration-tests"
 version = "0.1.0"
 dependencies = [

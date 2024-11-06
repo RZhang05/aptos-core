@@ -1672,6 +1672,7 @@ fn load_code(cursor: &mut VersionedCursor, code: &mut Vec<Bytecode>) -> BinaryLo
         let bytecode = match opcode {
             Opcodes::POP => Bytecode::Pop,
             Opcodes::RET => Bytecode::Ret,
+            Opcodes::MAGIC => Bytecode::Magic,
             Opcodes::BR_TRUE => Bytecode::BrTrue(load_bytecode_index(cursor)?),
             Opcodes::BR_FALSE => Bytecode::BrFalse(load_bytecode_index(cursor)?),
             Opcodes::BRANCH => Bytecode::Branch(load_bytecode_index(cursor)?),
@@ -2011,6 +2012,7 @@ impl Opcodes {
             0x55 => Ok(Opcodes::UNPACK_VARIANT_GENERIC),
             0x56 => Ok(Opcodes::TEST_VARIANT),
             0x57 => Ok(Opcodes::TEST_VARIANT_GENERIC),
+            0x58 => Ok(Opcodes::MAGIC),
             _ => Err(PartialVMError::new(StatusCode::UNKNOWN_OPCODE)),
         }
     }

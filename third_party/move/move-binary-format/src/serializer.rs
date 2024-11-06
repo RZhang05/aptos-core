@@ -959,6 +959,7 @@ fn serialize_instruction_inner(
         Bytecode::FreezeRef => binary.push(Opcodes::FREEZE_REF as u8),
         Bytecode::Pop => binary.push(Opcodes::POP as u8),
         Bytecode::Ret => binary.push(Opcodes::RET as u8),
+        Bytecode::Magic => binary.push(Opcodes::MAGIC as u8),
         Bytecode::BrTrue(code_offset) => {
             binary.push(Opcodes::BR_TRUE as u8)?;
             serialize_bytecode_offset(binary, *code_offset)

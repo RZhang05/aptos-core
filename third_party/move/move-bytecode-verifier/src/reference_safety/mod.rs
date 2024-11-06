@@ -393,6 +393,7 @@ fn execute_inner(
         },
 
         Bytecode::Branch(_)
+        | Bytecode::Magic
         | Bytecode::Nop
         | Bytecode::CastU8
         | Bytecode::CastU16

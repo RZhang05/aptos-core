@@ -90,6 +90,7 @@ fn execute_inner(
         },
 
         Bytecode::Pop
+        | Bytecode::Magic
         | Bytecode::BrTrue(_)
         | Bytecode::BrFalse(_)
         | Bytecode::Abort

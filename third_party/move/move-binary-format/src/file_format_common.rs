@@ -299,6 +299,7 @@ pub enum Opcodes {
     UNPACK_VARIANT_GENERIC      = 0x55,
     TEST_VARIANT                = 0x56,
     TEST_VARIANT_GENERIC        = 0x57,
+    MAGIC                       = 0x58,
 }
 
 /// Upper limit on the binary size
@@ -703,6 +704,7 @@ pub fn instruction_key(instruction: &Bytecode) -> u8 {
     let opcode = match instruction {
         Pop => Opcodes::POP,
         Ret => Opcodes::RET,
+        Magic => Opcodes::MAGIC,
         BrTrue(_) => Opcodes::BR_TRUE,
         BrFalse(_) => Opcodes::BR_FALSE,
         Branch(_) => Opcodes::BRANCH,
