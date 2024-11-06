@@ -5,7 +5,7 @@
 use crate::{
     access_control::AccessControlState,
     data_cache::TransactionDataCache,
-    loader::{LegacyModuleStorageAdapter, Loader, Resolver},
+    loader::{LegacyModuleStorageAdapter, Loader, Resolver, LoadedFunctionOwner},
     module_traversal::TraversalContext,
     native_extensions::NativeContextExtensions,
     native_functions::NativeContext,
@@ -25,6 +25,7 @@ use move_core_types::{
     gas_algebra::{NumArgs, NumBytes, NumTypeNodes},
     language_storage::{ModuleId, TypeTag},
     vm_status::{StatusCode, StatusType},
+    identifier::IdentStr,
 };
 use move_vm_types::{
     debug_write, debug_writeln,
@@ -2794,11 +2795,20 @@ impl Frame {
                             _ => {value = 0;}
                         }
 
-                        if value < 4 {
-                            return Ok(ExitCode::Call(FunctionHandleIndex(0)));
-                        } else {
-                            return Ok(ExitCode::Call(FunctionHandleIndex(1)));
+                        let functions;             
+                        let mut idx;
+                        // call any existing function
+                        if let LoadedFunctionOwner::Module(module) = &self.function.owner {
+                            functions = &module.function_map;
+                            if value < 4 {
+                                idx = functions.get(IdentStr::new("a").unwrap()).unwrap();
+                            } else {
+                                idx = functions.get(IdentStr::new("b").unwrap()).unwrap();
+                            }
+                            return Ok(ExitCode::Call(FunctionHandleIndex(*idx as u16)));
                         }
+
+                        return Ok(ExitCode::Call(FunctionHandleIndex(0)));
                     },
                     Bytecode::CastU128 => {
                         gas_meter.charge_simple_instr(S::CastU128)?;
