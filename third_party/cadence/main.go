@@ -11,6 +11,12 @@ func DoSomething(str string) interface{} {
 	return C.CString("hello")
 }
 
+//export GetMember
+func GetMember(v interface{}) interface{} {
+	// v is expected to be a compositeValue
+	return C.CString("does something")
+}
+
 //export CreateComposite
 func CreateComposite(
 	moveLoc int,
