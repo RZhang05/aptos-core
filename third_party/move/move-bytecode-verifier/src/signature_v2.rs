@@ -916,6 +916,7 @@ impl<'a, const N: usize> SignatureChecker<'a, N> {
                 // List out the other options explicitly so there's a compile error if a new
                 // bytecode gets added.
                 Pop
+                | Magic
                 | Ret
                 | Branch(_)
                 | BrTrue(_)

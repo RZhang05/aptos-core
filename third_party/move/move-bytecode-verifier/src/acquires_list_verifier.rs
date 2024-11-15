@@ -103,6 +103,7 @@ impl<'a> AcquiresVerifier<'a> {
             },
 
             Bytecode::Pop
+            | Bytecode::Magic
             | Bytecode::BrTrue(_)
             | Bytecode::BrFalse(_)
             | Bytecode::Abort

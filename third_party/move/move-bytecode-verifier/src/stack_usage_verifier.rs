@@ -139,6 +139,7 @@ impl<'a> StackUsageVerifier<'a> {
 
             // Instructions that pop and push once
             Bytecode::Not
+            | Bytecode::Magic // TODO:MAGIC
             | Bytecode::FreezeRef
             | Bytecode::ReadRef
             | Bytecode::Exists(_)
