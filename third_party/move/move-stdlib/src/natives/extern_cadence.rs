@@ -6,7 +6,6 @@
 
 use crate::natives::helpers::make_module_natives;
 use move_binary_format::errors::PartialVMResult;
-use move_core_types::gas_algebra::{InternalGas, InternalGasPerByte, NumBytes};
 use move_vm_runtime::native_functions::{NativeContext, NativeFunction};
 use move_vm_types::{
     loaded_data::runtime_types::Type,
@@ -19,8 +18,6 @@ use std::ffi::{CStr, CString, c_void};
 use std::os::raw::c_char;
 
 extern "C" {
-    fn DoSomething(str: GoString) -> GoInterface;
-
     fn CreateComposite(
         moveLoc: GoString, 
         moveKind: u64, 
@@ -29,8 +26,6 @@ extern "C" {
     ) -> u64;
 
     fn GetMember(key: u64, fieldName: GoString) -> GoInterface;
-
-    fn EmptyFunc();
 
     fn SetMember(key: u64, fieldName: GoString, value: *const c_void);
 }
@@ -81,12 +76,10 @@ fn native_create_composite(
     let address = CString::new(address_ref.as_slice()).expect("CString::new failed");
     let go_address = create_go_string(&address);
     let go_loc = create_go_string(&address);
-    
-    let cost = 0;
 
     let res = unsafe{ CreateComposite(go_loc, kind, go_iden, go_address) };
 
-    NativeResult::map_partial_vm_result_one(cost, Ok(Value::u64(res)))
+    NativeResult::map_partial_vm_result_one(0.into(), Ok(Value::u64(res)))
 }
 
 pub fn make_native_create_composite() -> NativeFunction {
@@ -116,16 +109,14 @@ pub fn make_native_create_composite() -> NativeFunction {
     let go_field = create_go_string(&field);
 
     let id = pop_arg!(args, u64);
-    
-    let cost = 0;
 
     let res = unsafe{ GetMember(id, go_field) };
 
     let cstr = unsafe {CStr::from_ptr(res.v as *const _)}.to_string_lossy();
 
-    let v = Value::vector_u8(cstr.to_bytes());
+    let v = Value::vector_u8(cstr.bytes());
 
-    NativeResult::map_partial_vm_result_one(cost, Ok(v))
+    NativeResult::map_partial_vm_result_one(0.into(), Ok(v))
 }
 
 pub fn make_native_get_member() -> NativeFunction {
@@ -152,6 +143,8 @@ pub fn make_native_get_member() -> NativeFunction {
     let value_ref = value_arg.as_bytes_ref();
     let value = CString::new(value_ref.as_slice()).expect("CString::new failed");
     let go_value = create_go_string(&value);
+    let go_ptr: *const GoString = &go_value;
+    let rawptr = go_ptr as *const c_void;
 
     let field_arg = pop_arg!(args, VectorRef);
     let field_ref = field_arg.as_bytes_ref();
@@ -159,12 +152,10 @@ pub fn make_native_get_member() -> NativeFunction {
     let go_field = create_go_string(&field);
 
     let id = pop_arg!(args, u64);
-    
-    let cost = 0;
 
-    unsafe{ SetMember(id, go_field, go_value) };
+    unsafe{ SetMember(id, go_field, rawptr) };
 
-    NativeResult::map_partial_vm_result_one(cost, Ok(Value::bool(true)))
+    NativeResult::map_partial_vm_result_one(0.into(), Ok(Value::bool(true)))
 }
 
 pub fn make_native_set_member() -> NativeFunction {
