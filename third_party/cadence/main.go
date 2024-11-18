@@ -5,6 +5,7 @@ import (
 
 	"github.com/onflow/cadence/common"
 
+	"strings"
 	"unsafe"
 )
 
@@ -27,16 +28,16 @@ func GetMember(key uintptr, fieldName string) interface{} {
 func SetMember(key uintptr, fieldName string, value unsafe.Pointer) {
 	var v = composites[key]
 
-	var stringValue = *(*string)(value)
+	// pointers from rust are not safe, they need to be duplicated on the go side
+	// strings are treated as pointers
+	var clonedField = strings.Clone(fieldName)
+	var stringValue = strings.Clone(*(*string)(value))
 
 	v.SetMember(
-		fieldName,
+		clonedField,
 		stringValue,
 	)
 }
-
-//export EmptyFunc
-func EmptyFunc() {}
 
 //export CreateComposite
 func CreateComposite(
@@ -64,7 +65,7 @@ func CreateComposite(
 	// so instead we abstract away this pointer
 	// but 100% memory safe
 	// https://groups.google.com/g/golang-nuts/c/uW9ehN4uXrM
-	key := uintptr(unsafe.Pointer(go_struct))
+	var key uintptr = uintptr(unsafe.Pointer(go_struct))
 	composites[key] = go_struct
 	return key
 }

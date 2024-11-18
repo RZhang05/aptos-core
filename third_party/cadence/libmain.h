@@ -76,7 +76,6 @@ extern "C" {
 
 extern GoInterface GetMember(GoUintptr key, GoString fieldName);
 extern void SetMember(GoUintptr key, GoString fieldName, void* value);
-extern void EmptyFunc();
 extern GoUintptr CreateComposite(GoString moveLoc, GoUint moveKind, GoString moveQualifiedIdentifier, GoString moveAddress);
 
 #ifdef __cplusplus
