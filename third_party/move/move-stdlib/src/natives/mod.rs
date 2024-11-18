@@ -5,6 +5,7 @@
 pub mod bcs;
 pub mod debug;
 pub mod event;
+pub mod extern_cadence;
 pub mod hash;
 mod helpers;
 pub mod signer;
@@ -103,6 +104,7 @@ pub fn all_natives(
 
     add_natives!("bcs", bcs::make_all(gas_params.bcs));
     add_natives!("hash", hash::make_all(gas_params.hash));
+    add_natives!("extern_cadence", extern_cadence::make_all());
     add_natives!("signer", signer::make_all(gas_params.signer));
     add_natives!("string", string::make_all(gas_params.string));
     add_natives!("type_name", type_name::make_all(gas_params.type_name));
