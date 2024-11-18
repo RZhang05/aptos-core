@@ -62,6 +62,16 @@ type CompositeValue struct {
 	QualifiedIdentifier string
 	Kind                common.CompositeKind
 	isDestroyed         bool
+	// tmp
+	fields				map[string]interface{}
+}
+
+func (v *CompositeValue) GetMember(name string) interface{} {
+	return v.fields[name]
+}
+
+func (v *CompositeValue) SetMember(name string, value interface{}) {
+	v.fields[name] = value
 }
 
 func NewCompositeValue(
@@ -102,6 +112,7 @@ func NewCompositeValue(
 		Location:            typeInfo.location,
 		QualifiedIdentifier: typeInfo.qualifiedIdentifier,
 		Kind:                typeInfo.kind,
+		fields: 			 make(map[string]interface{}),
 	}
 
 	//for _, field := range fields {
